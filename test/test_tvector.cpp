@@ -1,6 +1,7 @@
 #include <sstream>
 #include "gtest.h"
 #include "tmatrix.h"
+//#include "tmatrix_for_cmp.h"
 
 TEST(TDynamicVector, can_create_vector_with_positive_length)
 {
