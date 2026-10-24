@@ -80,6 +80,9 @@ TDynamicVector<T>::TDynamicVector(size_t size = 1) : sz(size)
 {
     if (sz == 0) 
         throw std::out_of_range("Vector size should be greater than zero");
+    if (sz > MAX_VECTOR_SIZE)
+        throw std::out_of_range("Vector size exceeds MAX_VECTOR_SIZE");
+
     pMem = new T[sz]();
 }
 template<typename T>
@@ -87,6 +90,9 @@ requires std::is_trivially_copyable_v<T>
 TDynamicVector<T>::TDynamicVector(T* arr, size_t s) : sz(s)
 {
     if (arr == nullptr) throw std::invalid_argument("Vector constructor requires non-nullptr arg");
+    if (sz > MAX_VECTOR_SIZE)
+        throw std::out_of_range("Vector size exceeds MAX_VECTOR_SIZE");
+
     pMem = new T[sz];
     std::memcpy(pMem, arr, sz * sizeof(T));
 }
@@ -323,6 +329,8 @@ public:
 
         if (new_rows == 0 || new_cols == 0)
             throw std::out_of_range("The number of columns and rows of the Matrix must be greater than zero");
+        if (rows > MAX_MATRIX_SIZE || cols > MAX_MATRIX_SIZE)
+            throw std::out_of_range("Matrix dimensions exceed MAX_MATRIX_SIZE");
 
         m.rows = new_rows;
         m.cols = new_cols;
@@ -355,6 +363,9 @@ TDynamicMatrix<T>::TDynamicMatrix(size_t r = 1, size_t c = 1) : rows(r), cols(c)
 {
     if (rows == 0 || cols == 0)
         throw std::out_of_range("The number of columns and rows of the Matrix must be greater than zero");
+    if (rows > MAX_MATRIX_SIZE || cols > MAX_MATRIX_SIZE)
+        throw std::out_of_range("Matrix dimensions exceed MAX_MATRIX_SIZE");
+
     pMem = TDynamicVector<T>(rows * cols);
 }
 template<typename T>
