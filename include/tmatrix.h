@@ -35,6 +35,8 @@ public:
     TDynamicVector& operator=(TDynamicVector&& v) noexcept;
 
     size_t size() const noexcept { return sz; }
+    T* data() noexcept { return pMem; }
+    const T* data() const noexcept { return pMem; }
 
     T& operator[](size_t ind) { return pMem[ind]; }
     const T& operator[](size_t ind) const { return pMem[ind]; }
@@ -369,7 +371,7 @@ TDynamicMatrix<T>::TDynamicMatrix(TDynamicMatrix&& m) noexcept : rows(m.rows), c
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicMatrix<T>::TDynamicMatrix& operator=(const TDynamicMatrix& m)
+TDynamicMatrix& TDynamicMatrix<T>::operator=(const TDynamicMatrix& m)
 {
     if (this == &m) return *this;
       
@@ -381,7 +383,7 @@ TDynamicMatrix<T>::TDynamicMatrix& operator=(const TDynamicMatrix& m)
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicMatrix<T>::TDynamicMatrix& operator=(TDynamicMatrix&& m) noexcept
+TDynamicMatrix& TDynamicMatrix<T>::operator=(TDynamicMatrix&& m) noexcept
 {
     if (this == &m) return *this;
     swap(*this, m);
@@ -434,16 +436,16 @@ TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const T& val) const
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicVector<T> TDynamicMatrix<T>::operator*(const TDynamicVector<T>& v)
+TDynamicVector<T> TDynamicMatrix<T>::operator*(const TDynamicVector<T>& v) const
 {
     if (cols != v.size())
         throw std::invalid_argument("Matrix columns must match vector size for multiplication");
 
     TDynamicVector<T> res(rows);
 
-    const T* __restrict mat_ptr = pMem.pMem;
-    const T* __restrict vec_ptr = v.pMem;
-    T* __restrict res_ptr = res.pMem;
+    const T* __restrict mat_ptr = pMem.data();
+    const T* __restrict vec_ptr = v.data();
+    T* __restrict res_ptr = res.data();
 
 #pragma omp parallel for
     for (size_t i = 0; i < rows; i++)
@@ -463,22 +465,77 @@ TDynamicVector<T> TDynamicMatrix<T>::operator*(const TDynamicVector<T>& v)
 
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicMatrix TDynamicMatrix<T>::operator+(const TDynamicMatrix& m)
+TDynamicMatrix<T> TDynamicMatrix<T>::operator+(const TDynamicMatrix& m) const
 {
-// можно ли написать реализацию, используя operator+ вектора?
-return TDynamicMatrix<T>{};
+    if (rows != m.rows || cols != m.cols)
+        throw std::invalid_argument("Matrix dimensions must be equal for addition");
+
+    TDynamicMatrix<T> res(rows, cols);
+    T* __restrict dst = res.pMem.data();
+    const T* __restrict src1 = pMem.data();
+    const T* __restrict src2 = m.pMem.data();
+
+    size_t total_elements = rows * cols;
+#pragma omp parallel for simd
+    for (size_t i = 0; i < total_elements; i++)
+    {
+        dst[i] = src1[i] + src2[i];
+    }
+
+    return res;
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicMatrix TDynamicMatrix<T>::operator-(const TDynamicMatrix& m)
+TDynamicMatrix<T> TDynamicMatrix<T>::operator-(const TDynamicMatrix& m) const
 {
-return TDynamicMatrix<T>{};
+    if (rows != m.rows || cols != m.cols)
+        throw std::invalid_argument("Matrix dimensions must be equal for addition");
+
+    TDynamicMatrix<T> res(rows, cols);
+    T* __restrict dst = res.pMem.data();
+    const T* __restrict src1 = pMem.data();
+    const T* __restrict src2 = m.pMem.data();
+
+    size_t total_elements = rows * cols;
+#pragma omp parallel for simd
+    for (size_t i = 0; i < total_elements; i++)
+    {
+        dst[i] = src1[i] - src2[i];
+    }
+
+    return res;
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicMatrix TDynamicMatrix<T>::operator*(const TDynamicMatrix& m)
+TDynamicMatrix<T> TDynamicMatrix<T>::operator*(const TDynamicMatrix& m) const
 {
-return TDynamicMatrix<T>{};
+    if (cols != m.rows)
+        throw std::invalid_argument("Number of columns and rows of the Matrices does not match for multiplication");
+
+    TDynamicMatrix<T> res(rows, m.cols);
+    T* __restrict dst = res.pMem.data();
+    const T* __restrict src1 = pMem.data();
+    const T* __restrict src2 = m.pMem.data();
+
+#pragma omp parallel for
+    for (size_t i = 0; i < rows; i++)
+    {
+        T* __restrict dst_row = dst + i * m.cols;
+        const T* __restrict src1_row = src1 + i * cols;
+
+        for (size_t k = 0; k < cols; k++)
+        {
+            const T v = src1_row[k];
+            const T* __restrict src2_row = src2 + k * m.cols;
+
+#pragma omp simd
+            for (size_t j = 0; j < m.cols; j++)
+            {
+                dst_row[j] += v * src2_row[j];
+            }
+        }
+    }
+    return res;
 }
 
 #endif
