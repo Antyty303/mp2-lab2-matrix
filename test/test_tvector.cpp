@@ -124,6 +124,7 @@ TEST(TDynamicVector, can_assign_vectors_of_different_size)
     TDynamicVector<int> v1(12), v2(2);
     v1[6] = 6;
     v1[1] = 1;
+    v2 = v1;
     EXPECT_EQ(1, v2[1]);
     EXPECT_EQ(6, v2[6]);
     EXPECT_EQ(12, v2.size());
@@ -243,7 +244,7 @@ TEST(TDynamicVector, can_read_vector)
   for (int i = 0; i < 5; i++) expected[i] = i;
   
   std::stringstream sstr;
-  sstr << "1 2 3 4 5\n";
+  sstr << "0 1 2 3 4\n";
   sstr >> v;
   
   EXPECT_EQ(expected, v);
@@ -251,9 +252,9 @@ TEST(TDynamicVector, can_read_vector)
 
 TEST(TDynamicVector, can_write_vector)
 {
-  TDynamicVector<int> v;
+  TDynamicVector<int> v(5);
   for (int i = 0; i < 5; i++) v[i] = i;
-  std::string expected = "1 2 3 4 5 ";
+  std::string expected = "0 1 2 3 4 ";
   
   std::stringstream sstr;
   sstr << v;

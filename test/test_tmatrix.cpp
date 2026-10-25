@@ -10,16 +10,14 @@ TEST(TDynamicMatrix, can_create_matrix_with_positive_length)
 
 TEST(TDynamicMatrix, cant_create_too_large_matrix)
 {
-	ASSERT_ANY_THROW({ TDynamicMatrix<int> m(MAX_MATRIX_SIZE + 1, 1), 
-					   TDynamicMatrix<int> m(1, MAX_MATRIX_SIZE + 1) }
-					);
+	ASSERT_ANY_THROW(TDynamicMatrix<int> m(MAX_MATRIX_SIZE + 1, 1));
+	ASSERT_ANY_THROW(TDynamicMatrix<int> m(1, MAX_MATRIX_SIZE + 1));
 }
 
 TEST(TDynamicMatrix, throws_when_create_matrix_with_negative_length)
 {
-	ASSERT_ANY_THROW({ TDynamicMatrix<int> m(-1, 1),
-						  TDynamicMatrix<int> m(1, -1) }
-	);
+	ASSERT_ANY_THROW(TDynamicMatrix<int> m(-1, 1));
+	ASSERT_ANY_THROW(TDynamicMatrix<int> m(1, -1));
 }
 
 TEST(TDynamicMatrix, can_create_copied_matrix)
@@ -74,7 +72,7 @@ TEST(TDynamicMatrix, throws_when_set_element_with_negative_index)
 TEST(TDynamicMatrix, throws_when_set_element_with_too_large_index)
 {
 	TDynamicMatrix<int> m(3, 3);
-	ASSERT_ANY_THROW(m.at(3);
+	ASSERT_ANY_THROW(m.at(3));
 }
 
 TEST(TDynamicMatrix, can_assign_matrix_to_itself)

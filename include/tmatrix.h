@@ -52,7 +52,7 @@ public:
 
     TDynamicVector operator+(const TDynamicVector& v) const;
     TDynamicVector operator-(const TDynamicVector& v) const;
-    T operator*(const TDynamicVector& v) const noexcept;
+    T operator*(const TDynamicVector& v) const;
 
     friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
     {
@@ -76,7 +76,7 @@ public:
 
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicVector<T>::TDynamicVector(size_t size = 1) : sz(size)
+TDynamicVector<T>::TDynamicVector(size_t size) : sz(size)
 {
     if (sz == 0) 
         throw std::out_of_range("Vector size should be greater than zero");
@@ -123,7 +123,7 @@ TDynamicVector<T>::~TDynamicVector()
 
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicVector<T>::TDynamicVector& operator=(const TDynamicVector& v)
+TDynamicVector<T>& TDynamicVector<T>::operator=(const TDynamicVector& v)
 {
     if (&v == this) return *this;
     delete pMem;
@@ -136,7 +136,7 @@ TDynamicVector<T>::TDynamicVector& operator=(const TDynamicVector& v)
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicVector<T>::TDynamicVector& operator=(TDynamicVector&& v) noexcept
+TDynamicVector<T>& TDynamicVector<T>::operator=(TDynamicVector&& v) noexcept
 {
     if (&v == this) return *this;
     delete pMem;
@@ -185,7 +185,7 @@ bool TDynamicVector<T>::operator!=(const TDynamicVector& v) const noexcept
 
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicVector<T> TDynamicVector<T>::operator+(T val)
+TDynamicVector<T> TDynamicVector<T>::operator+(T val) const
 {
     TDynamicVector<T> tmp(*this);
     for (size_t i = 0; i < sz; i++)
@@ -196,7 +196,7 @@ TDynamicVector<T> TDynamicVector<T>::operator+(T val)
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicVector<T> TDynamicVector<T>::operator-(double val)
+TDynamicVector<T> TDynamicVector<T>::operator-(T val) const
 {
     TDynamicVector<T> tmp(*this);
     for (size_t i = 0; i < sz; i++)
@@ -207,7 +207,7 @@ TDynamicVector<T> TDynamicVector<T>::operator-(double val)
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicVector<T> TDynamicVector<T>::operator*(double val)
+TDynamicVector<T> TDynamicVector<T>::operator*(T val) const
 {
     TDynamicVector<T> tmp(*this);
     for (size_t i = 0; i < sz; i++)
@@ -219,7 +219,7 @@ TDynamicVector<T> TDynamicVector<T>::operator*(double val)
 
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector& v)
+TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector& v) const
 {
     if (sz != v.sz)
         throw std::invalid_argument("Vector must have the same size for addition");
@@ -239,7 +239,7 @@ TDynamicVector<T> TDynamicVector<T>::operator+(const TDynamicVector& v)
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector& v)
+TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector& v) const
 {
     if (sz != v.sz)
         throw std::invalid_argument("Vector must have the same size for subtraction");
@@ -259,7 +259,7 @@ TDynamicVector<T> TDynamicVector<T>::operator-(const TDynamicVector& v)
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-T TDynamicVector<T>::operator*(const TDynamicVector& v) noexcept
+T TDynamicVector<T>::operator*(const TDynamicVector& v) const
 {
     if (sz != v.sz)
         throw std::invalid_argument("Vector must have the same size for product");
@@ -329,7 +329,7 @@ public:
 
         if (new_rows == 0 || new_cols == 0)
             throw std::out_of_range("The number of columns and rows of the Matrix must be greater than zero");
-        if (rows > MAX_MATRIX_SIZE || cols > MAX_MATRIX_SIZE)
+        if (new_rows > MAX_MATRIX_SIZE || new_cols > MAX_MATRIX_SIZE)
             throw std::out_of_range("Matrix dimensions exceed MAX_MATRIX_SIZE");
 
         m.rows = new_rows;
@@ -359,7 +359,7 @@ public:
 
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicMatrix<T>::TDynamicMatrix(size_t r = 1, size_t c = 1) : rows(r), cols(c)
+TDynamicMatrix<T>::TDynamicMatrix(size_t r, size_t c) : rows(r), cols(c)
 {
     if (rows == 0 || cols == 0)
         throw std::out_of_range("The number of columns and rows of the Matrix must be greater than zero");
@@ -382,7 +382,7 @@ TDynamicMatrix<T>::TDynamicMatrix(TDynamicMatrix&& m) noexcept : rows(m.rows), c
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicMatrix& TDynamicMatrix<T>::operator=(const TDynamicMatrix& m)
+TDynamicMatrix<T>& TDynamicMatrix<T>::operator=(const TDynamicMatrix<T>& m)
 {
     if (this == &m) return *this;
       
@@ -394,7 +394,7 @@ TDynamicMatrix& TDynamicMatrix<T>::operator=(const TDynamicMatrix& m)
 }
 template<typename T>
 requires std::is_trivially_copyable_v<T>
-TDynamicMatrix& TDynamicMatrix<T>::operator=(TDynamicMatrix&& m) noexcept
+TDynamicMatrix<T>& TDynamicMatrix<T>::operator=(TDynamicMatrix<T>&& m) noexcept
 {
     if (this == &m) return *this;
     swap(*this, m);
