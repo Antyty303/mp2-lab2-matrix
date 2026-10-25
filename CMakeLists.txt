@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.30)
 # disable googlemock
 option(BUILD_GMOCK "Builds the googlemock subproject" OFF)
 
-option(BUILD_SAMPLES "Builds all samples" ON)
+option(BUILD_SAMPLES "Builds all samples" OFF)
+option(BUILD_BENCHMARKS "Builds all benchmarks" ON)
 
 set(PROJECT_NAME matrix)
 project(${PROJECT_NAME})
@@ -39,6 +40,26 @@ if(BUILD_TESTING)
 	add_subdirectory(test)
 endif()
 
+#GOOGLE BENCHMARK-----------------------------------------------
+if(BUILD_BENCHMARKS)
+    # add googlebenchmark, version 1.9.1
+    include(FetchContent)
+    
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+    
+    FetchContent_Declare(
+      googlebenchmark
+      GIT_REPOSITORY https://github.com/google/benchmark.git
+      GIT_TAG        v1.9.1
+    )
+    
+    FetchContent_MakeAvailable(googlebenchmark)
+    
+    add_subdirectory(benchmark)
+endif()
+#----------------------------------------------------------------
 
 # REPORT
 message( STATUS "")
