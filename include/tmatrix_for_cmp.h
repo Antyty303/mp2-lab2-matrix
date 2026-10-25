@@ -1,5 +1,5 @@
-//Отличия в: TDynamicVectorForCMP: векторные operator +, -, *
-//           TDynamicMatrixForCMP: перемещающее присваивание, * на вектор, матричные +, -, *
+//ГЋГІГ«ГЁГ·ГЁГї Гў: TDynamicVectorForCMP: ГўГҐГЄГІГ®Г°Г­Г»ГҐ operator +, -, *
+//           TDynamicMatrixForCMP: ГЇГҐГ°ГҐГ¬ГҐГ№Г ГѕГ№ГҐГҐ ГЇГ°ГЁГ±ГўГ ГЁГўГ Г­ГЁГҐ, * Г­Г  ГўГҐГЄГІГ®Г°, Г¬Г ГІГ°ГЁГ·Г­Г»ГҐ +, -, *
 #ifndef __TDynamicMatrixForCMPForCMP_H__
 #define __TDynamicMatrixForCMPForCMP_H__
 
@@ -67,7 +67,7 @@ public:
 
 template<typename T>
     requires std::is_trivially_copyable_v<T>
-TDynamicVectorForCMP<T>::TDynamicVectorForCMP(size_t size = 1) : sz(size)
+TDynamicVectorForCMP<T>::TDynamicVectorForCMP(size_t size) : sz(size)
 {
     if (sz == 0)
         throw std::out_of_range("Vector size should be greater than zero");
@@ -326,7 +326,7 @@ public:
 
 template<typename T>
     requires std::is_trivially_copyable_v<T>
-TDynamicMatrixForCMP<T>::TDynamicMatrixForCMP(size_t r = 1, size_t c = 1) : rows(r), cols(c)
+TDynamicMatrixForCMP<T>::TDynamicMatrixForCMP(size_t r, size_t c) : rows(r), cols(c)
 {
     if (rows == 0 || cols == 0)
         throw std::out_of_range("The number of columns and rows of the Matrix must be greater than zero");
