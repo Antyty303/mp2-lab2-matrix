@@ -3,10 +3,21 @@ cmake_minimum_required(VERSION 3.30)
 # disable googlemock
 option(BUILD_GMOCK "Builds the googlemock subproject" OFF)
 
-option(BUILD_SAMPLES "Builds all samples" ON)
+option(BUILD_SAMPLES "Builds all samples" OFF)
+option(BUILD_BENCHMARKS "Builds all benchmarks" ON)
 
 set(PROJECT_NAME matrix)
 project(${PROJECT_NAME})
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -openmp")
+else()
+    find_package(OpenMP REQUIRED)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 
 include(CTest)
 enable_testing()  # defines BUILD_TESTING
@@ -29,6 +40,26 @@ if(BUILD_TESTING)
 	add_subdirectory(test)
 endif()
 
+#GOOGLE BENCHMARK-----------------------------------------------
+if(BUILD_BENCHMARKS)
+    # add googlebenchmark, version 1.9.1
+    include(FetchContent)
+    
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+    
+    FetchContent_Declare(
+      googlebenchmark
+      GIT_REPOSITORY https://github.com/google/benchmark.git
+      GIT_TAG        v1.9.1
+    )
+    
+    FetchContent_MakeAvailable(googlebenchmark)
+    
+    add_subdirectory(benchmark)
+endif()
+#----------------------------------------------------------------
 
 # REPORT
 message( STATUS "")

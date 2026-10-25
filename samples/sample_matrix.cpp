@@ -5,14 +5,14 @@
 // Тестирование матриц
 
 #include <iostream>
-#include "tmatrix.h"
+#include "tmatrix_for_cmp.h"
 
 using namespace std;
 //---------------------------------------------------------------------------
 
 int main()
 {
-  TDynamicMatrix<int> a(5), b(5), c(5);
+  TDynamicMatrix<int> a(5, 5), b(5,5), c(5, 5);
   int i, j;
 
   setlocale(LC_ALL, "Russian");
