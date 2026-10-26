@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30)
+ cmake_minimum_required(VERSION 3.30)
 
 # disable googlemock
 option(BUILD_GMOCK "Builds the googlemock subproject" OFF)
@@ -14,13 +14,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -openmp")
+elseif(MSVC)
+    find_package(OpenMP REQUIRED)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp:experimental")
 else()
     find_package(OpenMP REQUIRED)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-
-	if(MSVC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp:experimental")
-    endif()
 endif()
 
 include(CTest)
